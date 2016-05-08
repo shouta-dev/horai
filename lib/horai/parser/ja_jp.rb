@@ -111,6 +111,41 @@ module Horai
         truncate_time(date + 3.day)
       end
 
+      # 週、曜日（絶対）
+      filter /(先週|せんしゅう|今週|こんしゅう|来週|らいしゅう|次の|つぎの|今度の|こんどの|前の|まえの|この前の|このまえの)?.*([月火水木金土日])曜日?/, :absolute do |text, matches, date|
+        position = matches[1] || "次の"
+        wday_name = matches[2]
+
+        wdays = ["日", "月", "火", "水", "木", "金", "土"]
+        wday_num = wdays.index(wday_name)
+
+        result_date = if position == "先週" || position == "せんしゅう"
+          (date - (date.wday - wday_num)) - 7
+        elsif position == "今週" || position == "こんしゅう" 
+          (date - (date.wday - wday_num))
+        elsif position == "来週" || position == "らいしゅう"
+          (date - (date.wday - wday_num)) + 7
+        elsif (position == "次の" || position == "今度の" || position == "つぎの" || position == "こんどの")
+          if date.wday < wday_num
+            # 指定の曜日がまだ来ていない場合は今週の曜日を指している
+            (date - (date.wday - wday_num))
+          else
+            # 指定の曜日がもう来ている（同曜日含む）場合は来週の曜日を指している
+            (date - (date.wday - wday_num)) + 7
+          end
+        elsif (position == "前の" || position == "この前の" || position == "まえの" || position == "このまえの")
+          if date.wday < wday_num
+            # 指定の曜日がまだ来ていない場合は先週の曜日を指している
+            (date - (date.wday - wday_num)) - 7
+          else
+            # 指定の曜日がもう来ている（同曜日含む）場合は今週の曜日を指している
+            (date - (date.wday - wday_num))
+          end
+        end
+        truncate_time(datetime_delta(date, year: result_date.year, month: result_date.month, day: result_date.day))
+      end
+
+
       # 月日表現 (絶対)
       filter /(?<![\d\/-])(?<!\d)(\d{1,2})#{dd}(\d{1,2})(?!\d)(?!#{dd})/, :absolute do |text, matches, date|
         truncate_time(datetime_delta(date, month: matches[1], day: matches[2]))
