@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['uneco', 'mitukiii']
   spec.email         = ['aoki@limbate.com']
   spec.summary       = 'Derive DateTime from Time expression with Natural language (currently, Japanese only)'
-  spec.description   = 'Horai は日本語の時刻表現をパースし、DateTime型に変換することを目標としている Gem です。(beta) '
+  spec.description   = 'Horai is a parse japanese language to datetime(beta)'
   spec.homepage      = ''
   spec.license       = 'MIT'
 
